@@ -324,6 +324,37 @@ h2 {
 .loc[aria-pressed="true"] { color: var(--on-desk-muted); text-decoration: line-through; text-decoration-color: var(--stamp-on-desk); text-decoration-thickness: 2px; opacity: .55; }
 .result .kv:last-child { border-bottom: 0; padding-bottom: 0; }
 
+/* Table mode: the host phone lies in the middle of the table */
+#scr-table { gap: 14px; }
+.tbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.tround { font: 800 22px/1 var(--font-display); letter-spacing: .08em; text-transform: uppercase; color: var(--on-desk-muted); }
+.tinfo { margin: 0; font: 600 20px/1.25 var(--font-display); letter-spacing: .02em; }
+.tinfo b { color: var(--manila); font-weight: 800; }
+.tpanel { flex-direction: row; align-items: center; gap: 14px; padding: 10px 12px; }
+.tpanel .clock { flex: 1 1 auto; font-size: 60px; text-align: left; }
+.tpanel .btn { width: auto; flex: none; min-width: 120px; }
+.tmsg.t { text-align: left; }
+.tlocs { display: grid; gap: 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); --tsize: 24px; }
+.tloc {
+  display: flex; align-items: center;
+  min-height: 64px; padding: 12px 14px;
+  background: var(--manila); color: var(--ink);
+  border-radius: 10px;
+  font: 700 var(--tsize)/1.08 var(--font-display);
+  letter-spacing: .01em;
+  overflow-wrap: anywhere; -webkit-hyphens: auto; hyphens: auto;
+}
+.tlocs[data-size="xl"] { grid-template-columns: minmax(0, 1fr); --tsize: clamp(32px, 10vw, 48px); }
+.tlocs[data-size="xl"] .tloc { min-height: 96px; padding: 16px 20px; }
+.tlocs[data-size="l"] { --tsize: clamp(22px, 6.4vw, 30px); }
+.tlocs[data-size="l"] .tloc { min-height: 84px; }
+.tlocs[data-size="m"] { --tsize: clamp(18px, 5.2vw, 25px); }
+.tlocs[data-size="s"] { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; --tsize: clamp(15px, 4.2vw, 20px); }
+.tlocs[data-size="s"] .tloc { min-height: 54px; padding: 8px 10px; }
+.tlocs[data-size="xs"] { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; --tsize: clamp(13px, 3.7vw, 17px); }
+.tlocs[data-size="xs"] .tloc { min-height: 44px; padding: 6px 8px; border-radius: 7px; }
+.tfoot { margin: 0; font-size: 13px; color: var(--on-desk-muted); text-align: center; }
+
 /* Rules */
 details.rules { border-top: 1px solid var(--desk-line); padding-top: 12px; }
 details.rules summary {
@@ -353,7 +384,7 @@ details.rules .small { margin-top: 12px; }
 }
 </style>
 
-<main class="app">
+<main class="app" lang="de">
 
   <!-- Startseite -->
   <section class="screen" id="scr-home">
@@ -371,7 +402,7 @@ details.rules .small { margin-top: 12px; }
       <div class="tab">Mit Code beitreten</div>
       <div class="field">
         <label for="join-code">Spielcode</label>
-        <input id="join-code" class="code-input" placeholder="KXPQ-6-1" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="12">
+        <input id="join-code" class="code-input" placeholder="KXPQ-6-1-4" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="16">
       </div>
       <p class="err" id="join-err" hidden></p>
       <button class="btn ink" type="submit">Weiter</button>
@@ -380,13 +411,14 @@ details.rules .small { margin-top: 12px; }
     <details class="rules">
       <summary>So geht's</summary>
       <ul>
-        <li>Eine Person leitet: „Neues Spiel leiten“, Einstellungen wählen, Start. Ihr Handy zeigt dann für jede Person einen eigenen QR-Code.</li>
+        <li>Eine Person leitet: „Neues Spiel leiten“, Spieler, Orte, Spione und Zeit wählen, Start. Ihr Handy zeigt dann für jede Person einen eigenen QR-Code.</li>
+        <li>Für Einsteiger: mit 4 Orten spielen. Die Spielleitung legt ihr Handy im Tisch-Modus in die Mitte, dann sehen alle die möglichen Orte groß.</li>
         <li>Scannt im Uhrzeigersinn, angefangen links von der Spielleitung. So passen die Nummern zur Sitzordnung. Die Spielleitung ist Nr. 1.</li>
         <li>Wer scannt, landet direkt bei der eigenen geheimen Akte. Öffnen, lesen, bestätigen. Alle kennen den Ort und haben eine Rolle, nur der Spion nicht.</li>
         <li>Wer dran ist, stellt einer anderen Person eine Frage zum Ort. Die gefragte Person fragt als Nächstes, aber nicht gleich zurück.</li>
         <li>Wer jemanden verdächtigt, ruft eine Abstimmung aus. Sind alle anderen dafür, wird die Person aufgedeckt.</li>
         <li>Der Spion darf sich jederzeit outen und den Ort raten. Liegt er richtig, gewinnt er.</li>
-        <li>Läuft die Zeit ab, wird abgestimmt. Danach tippen alle auf „Nächste Runde“.</li>
+        <li>Läuft die Zeit ab, wird abgestimmt. Danach tippen alle auf „Nächste Runde“. Ein Ort kann auch zweimal hintereinander drankommen.</li>
       </ul>
       <p class="small">Es gibt keinen Server: Der Spielcode legt Orte, Rollen und Spione für jede Runde fest. Darum müssen alle auf derselben Runde sein.</p>
     </details>
@@ -405,6 +437,17 @@ details.rules .small { margin-top: 12px; }
           <button class="stepbtn" id="n-minus" type="button" aria-label="Ein Spieler weniger">–</button>
           <output class="val" id="n-val" aria-live="polite">6</output>
           <button class="stepbtn" id="n-plus" type="button" aria-label="Ein Spieler mehr">+</button>
+        </div>
+      </div>
+
+      <div class="setting">
+        <div class="set-head"><span class="set-lbl">Orte</span><span class="set-sub" id="loc-sub">Alle 27 Orte</span></div>
+        <div class="opts" role="group" aria-label="Anzahl Orte">
+          <button class="opt" type="button" data-locs="4" aria-pressed="false">4</button>
+          <button class="opt" type="button" data-locs="8" aria-pressed="false">8</button>
+          <button class="opt" type="button" data-locs="12" aria-pressed="false">12</button>
+          <button class="opt" type="button" data-locs="18" aria-pressed="false">18</button>
+          <button class="opt" type="button" data-locs="27" aria-pressed="true">Alle</button>
         </div>
       </div>
 
@@ -493,6 +536,8 @@ details.rules .small { margin-top: 12px; }
     <div class="screen" id="round-area" hidden>
       <p class="first" id="first-asker"></p>
 
+      <button class="btn manila" id="btn-table" type="button">Tisch-Modus: Orte groß für alle</button>
+
       <div class="panel">
         <div class="panel-head">
           <span class="lbl">Fragezeit</span>
@@ -524,6 +569,23 @@ details.rules .small { margin-top: 12px; }
     </div>
 
     <button class="btn ghost" id="btn-showqr" type="button" hidden>QR-Codes nochmal zeigen</button>
+  </section>
+
+  <!-- Tisch-Modus -->
+  <section class="screen" id="scr-table" hidden>
+    <div class="tbar">
+      <button class="back" id="table-back" type="button">‹ Meine Akte</button>
+      <span class="tround" id="t-round">Runde 1</span>
+    </div>
+    <p class="tinfo" id="t-info"></p>
+    <div class="panel tpanel">
+      <div class="clock" id="tclock" role="timer" aria-live="off">8:00</div>
+      <button class="btn manila" id="tt-start" type="button">Start</button>
+    </div>
+    <p class="tmsg t" id="tt-msg" hidden>Zeit um! Jetzt wird abgestimmt.</p>
+    <div class="lbl">Mögliche Orte</div>
+    <div class="tlocs" id="tlocs"></div>
+    <p class="tfoot">Dieses Handy zeigt keine Rollen.</p>
   </section>
 </main>
 <div class="toast" id="toast" role="status" hidden></div>
@@ -2872,10 +2934,10 @@ var qrcode = function() {
     { n: 'Polarstation', r: ['Expeditionsleiterin', 'Glaziologe', 'Meteorologin', 'Funker', 'Stationskoch', 'Hundeschlittenführerin', 'Biologe'] },
     { n: 'U-Boot', r: ['Kommandant', 'Sonar-Offizierin', 'Torpedomann', 'Koch', 'Funkerin', 'Navigator', 'Maschinistin'] }
   ];
-  const LOC_ORDER = LOCS.map(function (l) { return l.n; }).sort(function (a, b) { return a.localeCompare(b, 'de'); });
+  const LOC_OPTS = [4, 8, 12, 18, 27];
 
   const ALPH = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
-  const KEY = 'spyfall.v2';
+  const KEY = 'spyfall.v3';
   const KEY_SET = 'spyfall.settings';
   const DURS = [360000, 480000, 600000];
   const $ = function (id) { return document.getElementById(id); };
@@ -2913,10 +2975,19 @@ var qrcode = function() {
   }
   function range(n) { const a = []; for (let i = 1; i <= n; i++) a.push(i); return a; }
 
-  function roundInfo(code, n, spies, round) {
-    const cycle = Math.floor((round - 1) / LOCS.length);
-    const order = shuffle(LOCS.map(function (_, i) { return i; }), rand(code + '|ort|' + cycle));
-    const loc = LOCS[order[(round - 1) % LOCS.length]];
+  /* The game's location pool is fixed for the whole game; each round draws one of them at random
+     (independently, so nobody can rule out locations from earlier rounds). */
+  function pool(code, locs) {
+    const all = LOCS.map(function (_, i) { return i; });
+    if (locs >= LOCS.length) return all;
+    return shuffle(all, rand(code + '|pool')).slice(0, locs);
+  }
+  function poolNames(code, locs) {
+    return pool(code, locs).map(function (i) { return LOCS[i].n; }).sort(function (a, b) { return a.localeCompare(b, 'de'); });
+  }
+  function roundInfo(code, n, spies, locs, round) {
+    const p = pool(code, locs);
+    const loc = LOCS[p[Math.floor(rand(code + '|ort|' + round)() * p.length)]];
     const spySeats = shuffle(range(n), rand(code + '|spion|' + round)).slice(0, spies).sort(function (a, b) { return a - b; });
     const first = 1 + Math.floor(rand(code + '|start|' + round)() * n);
     const roles = shuffle(loc.r, rand(code + '|rollen|' + round));
@@ -2931,8 +3002,8 @@ var qrcode = function() {
   }
 
   /* ---------- codes ----------
-     Spielcode:  KXPQ-6-1          (Buchstaben-Spieler-Spione)
-     QR-Link:    …#KXPQ-6-1-8-3-1  (Spielcode-Minuten-Nummer-Runde) */
+     Spielcode:  KXPQ-6-1-4          (Buchstaben-Spieler-Spione-Orte)
+     QR-Link:    …#KXPQ-6-1-4-8-3-1  (Spielcode-Minuten-Nummer-Runde) */
   function newLetters() {
     const b = new Uint32Array(4);
     try { crypto.getRandomValues(b); } catch (e) { for (let i = 0; i < 4; i++) b[i] = Math.floor(Math.random() * 1e9); }
@@ -2943,28 +3014,34 @@ var qrcode = function() {
   function lettersOk(l) { for (const ch of l) if (ALPH.indexOf(ch) < 0) return false; return true; }
 
   function parseManual(raw) {
-    const s = String(raw || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
-    const m = s.match(/^([A-Z]{4})(\d{1,2})([12])$/);
-    if (!m) return { err: 'Der Spielcode sieht so aus: KXPQ-6-1 (vier Buchstaben, Spielerzahl, Spione).' };
-    if (!lettersOk(m[1])) return { err: 'Im Code kommt kein I und kein O vor. Bitte genau abschreiben.' };
-    const n = parseInt(m[2], 10), spies = parseInt(m[3], 10);
+    let s = String(raw || '').toUpperCase().trim();
+    s = s.replace(/[^A-Z0-9]+/g, '-').replace(/^-+|-+$/g, '').replace(/^([A-Z]{4})(?=\d)/, '$1-');
+    const p = s.split('-');
+    if (p.length !== 4 || !/^[A-Z]{4}$/.test(p[0]) || !/^\d{1,2}$/.test(p[1]) || !/^\d$/.test(p[2]) || !/^\d{1,2}$/.test(p[3])) {
+      return { err: 'Der Spielcode sieht so aus: KXPQ-6-1-4 (vier Buchstaben, Spieler, Spione, Orte, mit Bindestrichen).' };
+    }
+    if (!lettersOk(p[0])) return { err: 'Im Code kommt kein I und kein O vor. Bitte genau abschreiben.' };
+    const n = parseInt(p[1], 10), spies = parseInt(p[2], 10), locs = parseInt(p[3], 10);
     if (n < 3 || n > 12) return { err: 'Die erste Zahl ist die Spielerzahl (3 bis 12).' };
-    return { code: m[1] + '-' + n + '-' + spies, n: n, spies: spies };
+    if (spies < 1 || spies > 2) return { err: 'Die zweite Zahl ist die Anzahl der Spione (1 oder 2).' };
+    if (locs < 4 || locs > LOCS.length) return { err: 'Die dritte Zahl ist die Anzahl der Orte (4 bis 27).' };
+    return { code: p[0] + '-' + n + '-' + spies + '-' + locs, n: n, spies: spies, locs: locs };
   }
   function parseToken(raw) {
     const s = String(raw || '').toUpperCase().trim();
-    const m = s.match(/^([A-Z]{4})-(\d{1,2})-([12])-(\d{1,2})-(\d{1,2})-(\d{1,3})$/);
+    const m = s.match(/^([A-Z]{4})-(\d{1,2})-([12])-(\d{1,2})-(\d{1,2})-(\d{1,2})-(\d{1,3})$/);
     if (!m || !lettersOk(m[1])) return null;
-    const n = parseInt(m[2], 10), spies = parseInt(m[3], 10), min = parseInt(m[4], 10);
-    const seat = parseInt(m[5], 10), round = parseInt(m[6], 10);
-    if (n < 3 || n > 12 || seat < 1 || seat > n || round < 1) return null;
+    const n = parseInt(m[2], 10), spies = parseInt(m[3], 10), locs = parseInt(m[4], 10), min = parseInt(m[5], 10);
+    const seat = parseInt(m[6], 10), round = parseInt(m[7], 10);
+    if (n < 3 || n > 12 || locs < 4 || locs > LOCS.length || seat < 1 || seat > n || round < 1) return null;
     const dur = DURS.indexOf(min * 60000) >= 0 ? min * 60000 : 480000;
-    return { code: m[1] + '-' + n + '-' + spies, n: n, spies: spies, dur: dur, seat: seat, round: round };
+    return { code: m[1] + '-' + n + '-' + spies + '-' + locs, n: n, spies: spies, locs: locs, dur: dur, seat: seat, round: round };
   }
 
   /* ---------- state ---------- */
-  const S = { code: null, n: 0, spies: 1, seat: 0, round: 1, confirmed: 0, dur: 480000 };
-  const SET = { n: 6, spies: 1, dur: 480000 };
+  const S = { code: null, n: 0, spies: 1, locs: 27, seat: 0, round: 1, confirmed: 0, dur: 480000 };
+  const SET = { n: 6, spies: 1, locs: 27, dur: 480000 };
+  function cur() { return roundInfo(S.code, S.n, S.spies, S.locs, S.round); }
   const Q = { seat: 2, revisit: false };
   let pending = null;
   const strikes = new Set();
@@ -2973,12 +3050,12 @@ var qrcode = function() {
     try { const v = JSON.parse(localStorage.getItem(key) || 'null'); return v && typeof v === 'object' ? v : null; } catch (e) { return null; }
   }
   function save() {
-    try { localStorage.setItem(KEY, JSON.stringify({ code: S.code, n: S.n, spies: S.spies, seat: S.seat, round: S.round, confirmed: S.confirmed, dur: S.dur })); } catch (e) { /* storage blocked */ }
+    try { localStorage.setItem(KEY, JSON.stringify({ code: S.code, seat: S.seat, round: S.round, confirmed: S.confirmed, dur: S.dur })); } catch (e) { /* storage blocked */ }
   }
   function saveSettings() { try { localStorage.setItem(KEY_SET, JSON.stringify(SET)); } catch (e) { /* ignore */ } }
   function clearSave() { try { localStorage.removeItem(KEY); } catch (e) { /* ignore */ } }
 
-  const SCREENS = ['home', 'create', 'qr', 'seat', 'play'];
+  const SCREENS = ['home', 'create', 'qr', 'seat', 'play', 'table'];
   function show(name) {
     SCREENS.forEach(function (s) { $('scr-' + s).hidden = s !== name; });
     window.scrollTo(0, 0);
@@ -3034,6 +3111,11 @@ var qrcode = function() {
       b.disabled = v === 2 && SET.n < 6;
     });
     $('spy-sub').textContent = SET.spies === 2 ? 'Die beiden kennen sich nicht' : 'Zwei Spione ab 6 Spielern';
+    document.querySelectorAll('[data-locs]').forEach(function (b) {
+      b.setAttribute('aria-pressed', parseInt(b.getAttribute('data-locs'), 10) === SET.locs ? 'true' : 'false');
+    });
+    $('loc-sub').textContent = SET.locs === 4 ? 'Ideal für Einsteiger'
+      : SET.locs >= LOCS.length ? 'Alle 27 Orte' : SET.locs + ' zufällige Orte';
     document.querySelectorAll('[data-set-min]').forEach(function (b) {
       b.setAttribute('aria-pressed', parseInt(b.getAttribute('data-set-min'), 10) * 60000 === SET.dur ? 'true' : 'false');
     });
@@ -3046,10 +3128,13 @@ var qrcode = function() {
   document.querySelectorAll('[data-set-min]').forEach(function (b) {
     b.addEventListener('click', function () { SET.dur = parseInt(b.getAttribute('data-set-min'), 10) * 60000; renderCreate(); });
   });
+  document.querySelectorAll('[data-locs]').forEach(function (b) {
+    b.addEventListener('click', function () { SET.locs = parseInt(b.getAttribute('data-locs'), 10); renderCreate(); });
+  });
   $('btn-make').addEventListener('click', function () {
     saveSettings();
-    S.code = newLetters() + '-' + SET.n + '-' + SET.spies;
-    S.n = SET.n; S.spies = SET.spies; S.dur = SET.dur;
+    S.code = newLetters() + '-' + SET.n + '-' + SET.spies + '-' + SET.locs;
+    S.n = SET.n; S.spies = SET.spies; S.locs = SET.locs; S.dur = SET.dur;
     S.seat = 1; S.round = 1; S.confirmed = 0;
     strikes.clear(); resetTimer();
     save();
@@ -3142,7 +3227,7 @@ var qrcode = function() {
   }
 
   function joinAs(p, seat, round, dur) {
-    S.code = p.code; S.n = p.n; S.spies = p.spies; S.seat = seat;
+    S.code = p.code; S.n = p.n; S.spies = p.spies; S.locs = p.locs; S.seat = seat;
     S.round = round; S.confirmed = 0; S.dur = dur;
     strikes.clear(); resetTimer();
     save();
@@ -3172,7 +3257,7 @@ var qrcode = function() {
     closeDossier(false);
     renderStatus();
 
-    const info = roundInfo(S.code, S.n, S.spies, S.round);
+    const info = cur();
     const fa = $('first-asker');
     fa.textContent = '';
     const b = document.createElement('b');
@@ -3200,7 +3285,7 @@ var qrcode = function() {
   }
 
   function openDossier() {
-    const info = roundInfo(S.code, S.n, S.spies, S.round);
+    const info = cur();
     const c = $('dos-content');
     c.textContent = '';
     const wrap = document.createElement('div'); wrap.className = 'stack';
@@ -3257,7 +3342,7 @@ var qrcode = function() {
   arm($('btn-next'), 'Sicher? Nochmal tippen', function () { setRound(S.round + 1); toast('Runde ' + S.round + '. Alle anderen auch weiterschalten.'); });
 
   arm($('btn-resolve'), 'Runde vorbei? Nochmal tippen', function () {
-    const info = roundInfo(S.code, S.n, S.spies, S.round);
+    const info = cur();
     const c = $('resolve-content');
     c.textContent = '';
     c.appendChild(kv('Der Ort war', info.loc, 'loc'));
@@ -3282,10 +3367,33 @@ var qrcode = function() {
     renderQR(); show('qr');
   });
 
+  /* ---------- table mode ---------- */
+  function renderTable() {
+    const info = cur();
+    $('t-round').textContent = 'Runde ' + S.round;
+    const ti = $('t-info');
+    ti.textContent = '';
+    const b = document.createElement('b'); b.textContent = 'Nr. ' + info.first;
+    ti.appendChild(b);
+    ti.appendChild(document.createTextNode(' fragt zuerst · ' + (S.spies === 2 ? '2 Spione' : '1 Spion')));
+    const names = poolNames(S.code, S.locs);
+    const g = $('tlocs');
+    g.textContent = '';
+    const k = names.length;
+    g.setAttribute('data-size', k <= 4 ? 'xl' : k <= 8 ? 'l' : k <= 12 ? 'm' : k <= 18 ? 's' : 'xs');
+    names.forEach(function (name) {
+      const d = document.createElement('div'); d.className = 'tloc'; d.textContent = name;
+      g.appendChild(d);
+    });
+    renderTimer();
+  }
+  $('btn-table').addEventListener('click', function () { closeDossier(false); renderTable(); show('table'); });
+  $('table-back').addEventListener('click', function () { show('play'); });
+
   function renderLocs() {
     const g = $('locgrid');
     g.textContent = '';
-    LOC_ORDER.forEach(function (name) {
+    poolNames(S.code, S.locs).forEach(function (name) {
       const b = document.createElement('button');
       b.type = 'button'; b.className = 'loc';
       b.textContent = name;
@@ -3308,11 +3416,10 @@ var qrcode = function() {
   }
   function renderTimer() {
     const ms = T.running ? Math.max(0, T.endAt - Date.now()) : T.left;
-    $('clock').textContent = fmt(ms);
-    $('clock').classList.toggle('done', T.done);
-    $('t-msg').hidden = !T.done;
-    $('t-start').textContent = T.running ? 'Pause' : (T.left < S.dur && T.left > 0 ? 'Weiter' : 'Start');
-    $('t-start').disabled = T.done;
+    const label = T.running ? 'Pause' : (T.left < S.dur && T.left > 0 ? 'Weiter' : 'Start');
+    ['clock', 'tclock'].forEach(function (id) { $(id).textContent = fmt(ms); $(id).classList.toggle('done', T.done); });
+    ['t-msg', 'tt-msg'].forEach(function (id) { $(id).hidden = !T.done; });
+    ['t-start', 'tt-start'].forEach(function (id) { $(id).textContent = label; $(id).disabled = T.done; });
     document.querySelectorAll('.chip-btn').forEach(function (c) {
       c.setAttribute('aria-pressed', parseInt(c.getAttribute('data-min'), 10) * 60000 === S.dur ? 'true' : 'false');
     });
@@ -3353,7 +3460,7 @@ var qrcode = function() {
       }
     } catch (e) { /* ignore */ }
   }
-  $('t-start').addEventListener('click', function () {
+  function toggleTimer() {
     if (T.done) return;
     if (T.running) {
       T.left = Math.max(0, T.endAt - Date.now());
@@ -3364,7 +3471,9 @@ var qrcode = function() {
       clearInterval(T.iv); T.iv = setInterval(tick, 250);
     }
     renderTimer();
-  });
+  }
+  $('t-start').addEventListener('click', toggleTimer);
+  $('tt-start').addEventListener('click', toggleTimer);
   $('t-reset').addEventListener('click', resetTimer);
   document.querySelectorAll('.chip-btn').forEach(function (c) {
     c.addEventListener('click', function () {
@@ -3376,7 +3485,7 @@ var qrcode = function() {
   /* ---------- keep screen on, hide dossier when app goes to background ---------- */
   async function keepAwake() {
     try {
-      if ('wakeLock' in navigator && document.visibilityState === 'visible' && ($('scr-play').hidden === false || $('scr-qr').hidden === false)) {
+      if ('wakeLock' in navigator && document.visibilityState === 'visible' && ($('scr-play').hidden === false || $('scr-qr').hidden === false || $('scr-table').hidden === false)) {
         await navigator.wakeLock.request('screen');
       }
     } catch (e) { /* not allowed here */ }
@@ -3392,12 +3501,15 @@ var qrcode = function() {
     if (st.n >= 3 && st.n <= 12) SET.n = st.n;
     if (st.spies === 1 || st.spies === 2) SET.spies = st.spies;
     if (DURS.indexOf(st.dur) >= 0) SET.dur = st.dur;
+    if (LOC_OPTS.indexOf(st.locs) >= 0) SET.locs = st.locs;
   }
   const saved = load(KEY);
-  const savedOk = saved && saved.code && !parseManual(saved.code).err && saved.seat >= 1 && saved.seat <= saved.n;
+  const savedCode = saved && saved.code ? parseManual(saved.code) : null;
+  const savedOk = savedCode && !savedCode.err && saved.seat >= 1 && saved.seat <= savedCode.n;
 
   function resume(sv, minRound) {
-    S.code = sv.code; S.n = sv.n; S.spies = sv.spies === 2 ? 2 : 1; S.seat = sv.seat;
+    const pc = parseManual(sv.code);
+    S.code = pc.code; S.n = pc.n; S.spies = pc.spies; S.locs = pc.locs; S.seat = sv.seat;
     S.round = Math.max(1, parseInt(sv.round, 10) || 1, minRound || 1);
     S.confirmed = parseInt(sv.confirmed, 10) || 0;
     S.dur = DURS.indexOf(sv.dur) >= 0 ? sv.dur : 480000;
